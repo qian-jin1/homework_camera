@@ -1,0 +1,20 @@
+# 编译相关（必须忽略！）
+build/
+cmake-build-*/
+*.o
+*.so
+*.a
+main  # 你的可执行文件名（如果不是main，改成你的文件名）
+camera_record.avi  # 如果加了录屏功能，忽略录屏文件
+
+# VS Code 配置文件（忽略）
+.vscode/
+*.code-workspace
+
+# 临时文件
+*.tmp
+*.swp
+.DS_Store  # Mac 系统的临时文件（Linux 也可以加，不影响）
+
+# 日志文件
+*.log
