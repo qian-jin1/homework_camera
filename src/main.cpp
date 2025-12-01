@@ -113,6 +113,10 @@ void process_armors(const std::vector<auto_aim::Armor>& armors, cv::Mat& img,
             armor.left.top, armor.right.top,
             armor.right.bottom, armor.left.bottom
         };
+        std::vector<cv::Point> contour;
+        for (const auto& pt : img_pts) contour.emplace_back(cv::Point(pt.x, pt.y));
+        cv::polylines(img, contour, true, cv::Scalar(0, 255, 0), 2); 
+        
 
         // PnP解算相机坐标
         cv::Mat rvec, tvec_cam;
@@ -211,14 +215,14 @@ int main(int argc, char *argv[]) {
     cv::Mat img;  
 
     // 系统信息
-    fmt::print("=== 装甲板卡尔曼滤波预测系统 ===\n");
+   
     fmt::print("当前相机Pitch角：{}°\n", TEST_CAMERA_PITCH);
 
 #ifdef USE_CAMERA
     // 相机模式
     fmt::print("运行模式：相机（按 'q' 退出）\n");
     try {
-        io::Camera camera(50, 0);  
+        io::Camera camera(-1, 0);  
         while (true) {
             camera.read(img);
             if (img.empty()) {
@@ -228,7 +232,8 @@ int main(int argc, char *argv[]) {
             cv::resize(img, img, cv::Size(), 0.6, 0.6);
 
             // 检测并处理装甲板
-            auto armors = detector.detect(img);
+            auto armors_list = detector.detect(img);  // 获取list
+            std::vector<auto_aim::Armor> armors(armors_list.begin(), armors_list.end());  // 转vector
             fmt::print("\n检测到 {} 个装甲板\n", armors.size());
             process_armors(armors, img, camera_matrix, distort_coeffs, object_points);
 
@@ -250,7 +255,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    const int WAIT_MS = 33; 
+    const int WAIT_MS = 20; 
    
 while (true) {
     cap >> img;
